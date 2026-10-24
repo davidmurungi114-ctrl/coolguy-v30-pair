@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { default: makeWASocket, useMultiFileAuthState, Browsers, delay, makeCacheableSignalKeyStore } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, Browsers, delay, makeCacheableSignalKeyStore, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const fs = require('fs');
 
@@ -11,83 +11,55 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 const PORT = 25410;
 
-const activeSockets = new Map();
+app.get('/', (req,res)=> res.sendFile(path.join(__dirname,'public','index.html')));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/pair', async (req, res) => {
-  let number = req.query.number;
-  if (!number) return res.status(400).json({ error: 'Number required' });
-  number = number.replace(/[^0-9]/g, '');
-  if (number.length < 10) return res.status(400).json({ error: 'Invalid number' });
-  const sessionId = `${number}_${Date.now()}`;
-  const authFolder = `./auth_${sessionId}`;
-  try {
+app.get('/pair', async (req,res)=>{
+  let number = (req.query.number||'').replace(/[^0-9]/g,'');
+  if(!number || number.length <10) return res.status(400).json({error:'Invalid number'});
+  const authFolder = `./auth_${number}_${Date.now()}`;
+  try{
     const { state, saveCreds } = await useMultiFileAuthState(authFolder);
+    const { version } = await fetchLatestBaileysVersion();
+    console.log(`Using WA v${version.join('.')}`);
     const sock = makeWASocket({
-      auth: {
-        creds: state.creds,
-        keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' }))
-      },
-      logger: pino({ level: 'silent' }),
+      version,
+      auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, pino({level:'silent'})) },
+      logger: pino({level:'silent'}),
+      browser: Browsers.macOS("Desktop"),
       printQRInTerminal: false,
-      browser: Browsers.macOS("Chrome"),
-      connectTimeoutMs: 60000,
-      keepAliveIntervalMs: 10000,
+      syncFullHistory: false,
     });
-    activeSockets.set(sessionId, sock);
     sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', async (update) => {
-      const { connection } = update;
-      if (connection === 'open') {
-        console.log(`✅ ${number} Connected! Sending to inbox...`);
+    sock.ev.on('connection.update', async (u)=>{
+      const { connection } = u;
+      if(connection === 'open'){
+        console.log(`✅ ${number} OPEN! Sending inbox...`);
         await delay(3000);
-        try {
-          const credsFile = fs.readFileSync(path.join(authFolder, 'creds.json'));
+        try{
+          const credsFile = fs.readFileSync(path.join(authFolder,'creds.json'));
           const sessionID = Buffer.from(credsFile).toString('base64');
-          await sock.sendMessage(`${number}@s.whatsapp.net`, {
-            text: `*🔴 COOLGUY-MD V30 CONNECTED* ✅\n\n*SESSION_ID:*\nCOOLGUY_V30_${sessionID}\n\nCopy and paste in bot env\n\nOwner: 256750765838 Kampala 🇺🇬`
-          });
-          await sock.sendMessage(`${number}@s.whatsapp.net`, {
-            document: credsFile,
-            mimetype: "application/json",
-            fileName: "creds.json",
-            caption: "COOLGUY V30 creds.json"
-          });
-          await delay(2000);
-          fs.rmSync(authFolder, { recursive: true, force: true });
-          try { sock.end(); } catch {}
-          activeSockets.delete(sessionId);
-        } catch (e) { console.error(e); }
+          await sock.sendMessage(`${number}@s.whatsapp.net`, { text: `*COOLGUY V30 CONNECTED ✅*\n\n*SESSION_ID:*\nCOOLGUY_V30_${sessionID}\n\nOwner 256750765838` });
+          await delay(1000);
+          await sock.sendMessage(`${number}@s.whatsapp.net`, { document: credsFile, mimetype:"application/json", fileName:"creds.json" });
+          console.log(`📩 Sent to ${number}`);
+        }catch(e){ console.log('Send error', e.message) }
       }
     });
 
-    if (!sock.authState.creds.registered) {
-      await delay(3000);
-      let rawCode = await sock.requestPairingCode(number);
-      let cleanCode = rawCode.replace(/[^A-Z0-9]/g, '').toUpperCase();
-      console.log(`Code ${cleanCode} for ${number}`);
-      res.json({ code: cleanCode, expiresIn: 120 });
-      setTimeout(() => {
-        try {
-          if (activeSockets.has(sessionId)) {
-            try { activeSockets.get(sessionId).end(); } catch {}
-            activeSockets.delete(sessionId);
-          }
-          if (fs.existsSync(authFolder)) fs.rmSync(authFolder, { recursive: true, force: true });
-        } catch {}
-      }, 120000);
-    } else {
-      res.status(400).json({ error: 'Already registered' });
+    await delay(2000);
+    if(!sock.authState.creds.registered){
+      let code = await sock.requestPairingCode(number);
+      code = code.replace(/[^A-Z0-9]/g,'').toUpperCase();
+      console.log(`Code ${code} for ${number}`);
+      res.json({ code });
+      setTimeout(()=>{ try{ fs.rmSync(authFolder,{recursive:true,force:true}); }catch{} }, 180000);
     }
-  } catch (err) {
+  }catch(err){
     console.error(err);
-    res.status(500).json({ error: err.message });
-    try { fs.rmSync(authFolder, { recursive: true, force: true }); } catch {}
+    res.status(500).json({error: err.message});
+    try{ fs.rmSync(authFolder,{recursive:true,force:true}); }catch{}
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => console.log(`COOLGUY V30 LIVE FIXED on ${PORT}`));
+app.listen(PORT,'0.0.0.0',()=>console.log(`COOLGUY V30 LIVE FIXED on ${PORT}`));
