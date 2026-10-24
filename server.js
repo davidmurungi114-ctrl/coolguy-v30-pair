@@ -61,4 +61,4 @@ app.get('/pair', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`COOLGUY V30 LIVE on ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`COOLGUY V30 LIVE on ${PORT}`));
