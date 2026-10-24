@@ -1,22 +1,64 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>COOLGUY V30 PAIR</title>
-<style>*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}body{background:#020a02;color:#fff;padding:15px;display:flex;justify-content:center}.container{max-width:450px;width:100%}.card{background:#0c180c;border:1px solid #00ff88;border-radius:20px;padding:20px;box-shadow:0 0 20px rgba(0,255,136,.2)}.avatar{width:75px;height:75px;border-radius:50%;border:3px solid #00ff88;object-fit:cover}.btn{width:100%;background:#00ff88;color:#000;border:none;padding:18px;border-radius:14px;font-weight:900;font-size:18px}.input{width:100%;background:#000;border:2px solid #00ff88;color:#00ff88;padding:16px;border-radius:14px;text-align:center;font-weight:700;font-size:18px}.code-box{display:none;margin-top:20px;background:#000;border:3px dashed #00ff88;border-radius:16px;padding:20px;text-align:center}.code-box.show{display:block}.code{font-size:40px;font-weight:900;color:#00ff88;letter-spacing:5px;margin:15px 0}</style></head>
-<body><div class="container">
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COOLGUY V30 PAIR</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#020a02;color:#fff;padding:15px;display:flex;justify-content:center}
+.container{max-width:450px;width:100%}
+.card{background:#0c180c;border:1px solid #00ff88;border-radius:20px;padding:20px;box-shadow:0 0 20px rgba(0,255,136,.2)}
+.avatar{width:75px;height:75px;border-radius:50%;border:3px solid #00ff88;object-fit:cover;background:#000}
+.btn{width:100%;background:#00ff88;color:#000;border:none;padding:18px;border-radius:14px;font-weight:900;font-size:18px;cursor:pointer}
+.btn:disabled{opacity:0.6}
+.input{width:100%;background:#000;border:2px solid #00ff88;color:#00ff88;padding:16px;border-radius:14px;text-align:center;font-weight:700;font-size:18px}
+.code-box{display:none;margin-top:20px;background:#000;border:3px dashed #00ff88;border-radius:16px;padding:20px;text-align:center}
+.code-box.show{display:block}
+.code{font-size:38px;font-weight:900;color:#00ff88;letter-spacing:3px;margin:15px 0;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="container">
 <div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;">
-<img src="https://files.catbox.moe/hfde4b.jpg" class="avatar">
-<div><h1 style="font-size:18px;">PROFESSOR COOLGUY MD V30</h1><p style="color:#00ff88;font-size:12px;">🟢 LIVE - 90s Ultra Pairing</p></div>
+<img src="https://files.catbox.moe/hfde4b.jpg" class="avatar" alt="COOLGUY DP">
+<div>
+<h1 style="font-size:18px;">PROFESSOR COOLGUY MD V30</h1>
+<p style="color:#00ff88;font-size:12px;">🟢 LIVE - 90s Ultra Pairing</p>
+</div>
 </div>
 <div class="card">
 <h3>📱 WhatsApp Number</h3>
 <input id="num" class="input" value="256750765838">
 <button id="btn" class="btn" onclick="gen()" style="margin-top:15px;">🔗 GENERATE 8-DIGIT CODE (90s)</button>
 <div id="box" class="code-box">
-<p style="color:#aaa;">YOUR CODE:</p><div id="code" class="code">---- ----</div>
+<p style="color:#aaa;">YOUR CODE:</p>
+<div id="code" class="code">---- ----</div>
 <p>Expires in <span id="timer" style="color:#ffaa00;font-weight:900;font-size:26px;">90s</span></p>
 <p style="color:#00ff88;font-size:11px;margin-top:8px;">WhatsApp > Linked Devices > Link with phone number</p>
 </div>
 </div>
 </div>
 <script>
-async function gen(){const n=document.getElementById('num').value.replace(/[^0-9]/g,'');if(n.length<10)return alert('Add 256');const b=document.getElementById('btn'),box=document.getElementById('box'),c=document.getElementById('code');b.disabled=true;b.textContent='GENERATING...';box.classList.add('show');c.textContent='.... ....';try{const r=await fetch('/pair?number='+n);const d=await r.json();if(d.code){c.textContent=d.code;b.textContent='✅ CODE LIVE!';let s=90;const iv=setInterval(()=>{s--;document.getElementById('timer').textContent=s+'s';if(s<=0){clearInterval(iv);document.getElementById('timer').textContent='EXPIRED';b.disabled=false;b.textContent='🔗 GENERATE NEW CODE'}},1000)}else{alert(d.error);b.disabled=false;b.textContent='GENERATE'}}catch(e){alert(e.message);b.disabled=false;b.textContent='GENERATE'}}
-</script></body></html>
+async function gen(){
+const n=document.getElementById('num').value.replace(/[^0-9]/g,'');
+if(n.length<10)return alert('Add number with 256');
+const b=document.getElementById('btn'),box=document.getElementById('box'),c=document.getElementById('code');
+b.disabled=true;b.textContent='⏳ GENERATING...';box.classList.add('show');c.textContent='.... ....';
+try{
+const r=await fetch('/pair?number='+n);
+const d=await r.json();
+if(d.code){
+c.textContent=d.code;
+b.textContent='✅ CODE LIVE!';
+let s=90;
+const iv=setInterval(()=>{
+s--;document.getElementById('timer').textContent=s+'s';
+if(s<=0){clearInterval(iv);document.getElementById('timer').textContent='EXPIRED';b.disabled=false;b.textContent='🔗 GENERATE NEW CODE'}
+},1000)
+}else{alert(d.error||'Failed');b.disabled=false;b.textContent='🔗 GENERATE CODE'}
+}catch(e){alert(e.message);b.disabled=false;b.textContent='🔗 GENERATE CODE'}
+}
+</script>
+</body>
+  </html>
