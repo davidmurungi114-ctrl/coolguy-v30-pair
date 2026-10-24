@@ -40,7 +40,6 @@ app.get('/pair', async (req, res) => {
     activeSockets.set(sessionId, sock);
     sock.ev.on('creds.update', saveCreds);
 
-    // >>> ADDED: SEND TO INBOX <<<
     sock.ev.on('connection.update', async (update) => {
       const { connection } = update;
       if (connection === 'open') {
@@ -49,18 +48,15 @@ app.get('/pair', async (req, res) => {
         try {
           const credsFile = fs.readFileSync(path.join(authFolder, 'creds.json'));
           const sessionID = Buffer.from(credsFile).toString('base64');
-
           await sock.sendMessage(`${number}@s.whatsapp.net`, {
-            text: `*🔴 COOLGUY-MD V30 CONNECTED* ✅\n\n*SESSION_ID:*\nCOOLGUY_V30_${sessionID}\n\nCopy this and paste in your bot.\n\nOwner: 256750765838 Kampala 🇺🇬`
+            text: `*🔴 COOLGUY-MD V30 CONNECTED* ✅\n\n*SESSION_ID:*\nCOOLGUY_V30_${sessionID}\n\nCopy and paste in bot env\n\nOwner: 256750765838 Kampala 🇺🇬`
           });
-
           await sock.sendMessage(`${number}@s.whatsapp.net`, {
             document: credsFile,
             mimetype: "application/json",
             fileName: "creds.json",
             caption: "COOLGUY V30 creds.json"
           });
-
           await delay(2000);
           fs.rmSync(authFolder, { recursive: true, force: true });
           try { sock.end(); } catch {}
@@ -70,11 +66,11 @@ app.get('/pair', async (req, res) => {
     });
 
     if (!sock.authState.creds.registered) {
-      await delay(4000);
+      await delay(3000);
       let rawCode = await sock.requestPairingCode(number);
-      let formattedCode = rawCode.match(/.{1,4}/g)?.join('-').toUpperCase() || rawCode.toUpperCase();
-      console.log(`Code ${formattedCode} for ${number}`);
-      res.json({ code: formattedCode, raw: rawCode, expiresIn: 120 });
+      let cleanCode = rawCode.replace(/[^A-Z0-9]/g, '').toUpperCase();
+      console.log(`Code ${cleanCode} for ${number}`);
+      res.json({ code: cleanCode, expiresIn: 120 });
       setTimeout(() => {
         try {
           if (activeSockets.has(sessionId)) {
@@ -94,4 +90,4 @@ app.get('/pair', async (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => console.log(`COOLGUY V30 LIVE on ${PORT} WITH INBOX`));
+app.listen(PORT, '0.0.0.0', () => console.log(`COOLGUY V30 LIVE FIXED on ${PORT}`));
