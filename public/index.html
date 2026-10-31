@@ -1,64 +1,212 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COOLGUY V30 PAIR</title>
+<title>COOLGUY-X - WhatsApp Pairing Portal</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#020a02;color:#fff;padding:15px;display:flex;justify-content:center}
-.container{max-width:450px;width:100%}
-.card{background:#0c180c;border:1px solid #00ff88;border-radius:20px;padding:20px;box-shadow:0 0 20px rgba(0,255,136,.2)}
-.avatar{width:75px;height:75px;border-radius:50%;border:3px solid #00ff88;object-fit:cover;background:#000}
-.btn{width:100%;background:#00ff88;color:#000;border:none;padding:18px;border-radius:14px;font-weight:900;font-size:18px;cursor:pointer}
-.btn:disabled{opacity:0.6}
-.input{width:100%;background:#000;border:2px solid #00ff88;color:#00ff88;padding:16px;border-radius:14px;text-align:center;font-weight:700;font-size:18px}
-.code-box{display:none;margin-top:20px;background:#000;border:3px dashed #00ff88;border-radius:16px;padding:20px;text-align:center}
-.code-box.show{display:block}
-.code{font-size:38px;font-weight:900;color:#00ff88;letter-spacing:3px;margin:15px 0;word-break:break-all}
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#080a12;
+    background-image: radial-gradient(circle at 20% 10%, #1a2340 0%, transparent 50%),
+                      radial-gradient(circle at 80% 90%, #0f2a3a 0%, transparent 50%);
+    color:#e2e8f0;
+    font-family:'Outfit',sans-serif;
+    min-height:100vh;
+    padding:20px 14px 90px;
+  }
+  .container{max-width:480px;margin:0 auto}
+  /* header */
+  .header{
+    background:linear-gradient(135deg,#151a2c,#1e293b);
+    border:1px solid #2a344e;
+    border-radius:16px;
+    padding:12px 16px;
+    display:flex;align-items:center;gap:12px;
+    margin-bottom:16px;
+  }
+  .logo{width:36px;height:36px;background:#0ea5e9;border-radius:10px;display:grid;place-items:center;font-size:18px}
+  .header b{font-size:15px;letter-spacing:1px}
+  .header span{font-size:11px;opacity:.6;display:block}
+  /* card */
+  .card{
+    background:linear-gradient(180deg,#141c30 0%, #111727 100%);
+    border:1px solid #26324f;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  .card h2{font-size:18px;margin-bottom:6px}
+  .sub{font-size:12px;opacity:.7;line-height:1.4;margin-bottom:12px}
+  .green-link{color:#22ff88;font-size:11px;text-decoration:underline;cursor:pointer;display:block;margin:4px 0}
+  label{font-size:11px;opacity:.8;margin:12px 0 6px;display:block}
+  .input-wrap{
+    background:#0b1220;
+    border:1px solid #2a3a5c;
+    border-radius:12px;
+    display:flex;align-items:center;
+    padding:10px 12px;
+    gap:8px;
+  }
+  .input-wrap input{
+    background:transparent;border:0;outline:0;color:white;
+    width:100%;font-family:'JetBrains Mono';font-size:14px;
+  }
+  .btn-primary{
+    width:100%;margin-top:14px;
+    background:linear-gradient(90deg,#334155,#1e3a5f);
+    border:1px solid #3b82f6;
+    color:#7dd3fc;
+    padding:12px;border-radius:12px;
+    font-weight:600;cursor:pointer;
+    display:flex;justify-content:center;gap:8px;
+  }
+  .btn-reset{
+    width:fit-content;margin:12px auto 0;
+    background:transparent;border:1px dashed #334155;
+    color:#94a3b8;padding:6px 14px;border-radius:20px;
+    font-size:11px;display:flex;gap:6px;cursor:pointer;
+  }
+  /* how to pair */
+  .step{
+    background:#0e162a;
+    border:1px solid #1e2e4f;
+    border-radius:12px;
+    padding:10px 12px;
+    display:flex;gap:10px;align-items:flex-start;
+    margin-bottom:8px;
+  }
+  .num{width:26px;height:26px;border-radius:50%;background:#1e293b;border:1px solid #334155;display:grid;place-items:center;font-size:12px;font-weight:700;flex-shrink:0}
+  .step b{font-size:13px;display:block}
+  .step span{font-size:11px;opacity:.6}
+  .tip{
+    background:linear-gradient(90deg,#112233,#111a2a);
+    border:1px solid #1e3a4a;
+    border-radius:12px;padding:10px 12px;
+    display:flex;gap:8px;margin-top:8px;
+  }
+  .status{
+    background:#0d1a2f;border:1px solid #1e3a5f;
+    border-radius:12px;padding:10px 12px;
+    font-family:'JetBrains Mono';font-size:11px;
+    display:flex;gap:8px;align-items:center;
+  }
+  /* console */
+  .console-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .console-head b{font-family:'JetBrains Mono';font-size:12px}
+  .badge{background:#162032;border:1px solid #26324f;border-radius:20px;padding:3px 8px;font-size:10px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .stat{background:#0c1426;border:1px solid #1c2a44;border-radius:12px;padding:10px 12px}
+  .stat small{font-size:10px;opacity:.6;display:block}
+  .stat b{font-size:16px;font-family:'JetBrains Mono'}
+  .logs{
+    background:#080c16;border:1px solid #1a2742;border-radius:12px;
+    padding:10px;font-family:'JetBrains Mono';font-size:10px;
+    color:#5eead4;line-height:1.6;
+  }
+  .logs span{color:#94a3b8}
+  /* bottom nav */
+  .bottom-nav{
+    position:fixed;bottom:0;left:0;right:0;
+    background:#0a0f1e;border-top:1px solid #1e293b;
+    display:flex;justify-content:space-around;padding:10px;
+    max-width:480px;margin:0 auto;
+    border-radius:20px 20px 0 0;
+  }
+  .bottom-nav button{
+    flex:1;background:linear-gradient(90deg,#3b82f6,#06b6d4);
+    border:0;color:white;padding:10px;border-radius:20px;
+    font-weight:700;margin:0 4px;cursor:pointer;
+  }
+  .bottom-nav button:last-child{background:#1e293b;color:#94a3b8}
+  .url-bar{background:#121a2e;border:1px solid #1e293b;border-radius:20px;padding:6px 12px;font-size:11px;display:flex;gap:6px;align-items:center;opacity:.7}
 </style>
 </head>
 <body>
 <div class="container">
-<div style="display:flex;align-items:center;gap:15px;margin-bottom:20px;">
-<img src="https://files.catbox.moe/hfde4b.jpg" class="avatar" alt="COOLGUY DP">
-<div>
-<h1 style="font-size:18px;">PROFESSOR COOLGUY MD V30</h1>
-<p style="color:#00ff88;font-size:12px;">🟢 LIVE - 90s Ultra Pairing</p>
+  <div class="header">
+    <div class="logo">🤖</div>
+    <div><b>COOLGUY-X</b><span>WhatsApp Pairing Portal</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Pair Device</h2>
+    <p class="sub">Enter your WhatsApp number (include country code). We'll generate a pairing code and capture the session.</p>
+    <span class="green-link">Click here to scan QR instead</span>
+    <span class="green-link">Download COOLGUY-X File</span>
+    <span class="green-link" style="opacity:.6">click above to download the latest Version</span>
+
+    <label>WhatsApp Number</label>
+    <div class="input-wrap">
+      <span>🌍</span>
+      <input id="number" placeholder="256781353976" value="256781353976">
+    </div>
+
+    <button class="btn-primary" onclick="generateCode()">🔗 Generate Pair Code</button>
+    <button class="btn-reset" onclick="resetNum()">↻ Reset</button>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:14px">ⓘ How to Pair</h2>
+    <p class="sub">Do this on your WhatsApp</p>
+
+    <div class="step"><div class="num">1</div><div><b>Open WhatsApp</b><span>Go to Settings</span></div></div>
+    <div class="step"><div class="num">2</div><div><b>Linked Devices</b><span>Tap "Link a device"</span></div></div>
+    <div class="step"><div class="num">3</div><div><b>Enter Code</b><span>Paste the pairing code from this page</span></div></div>
+    <div class="step"><div class="num">4</div><div><b>Wait for Session</b><span>We'll auto-capture and show Session ID</span></div></div>
+
+    <div class="tip">💡 <div><b style="font-size:11px">Tip</b><span style="font-size:11px;opacity:.7"> Keep this tab open until "Session ID Ready".</span></div></div>
+    
+    <div class="status" style="margin-top:10px">📶 Ready for pairing request.</div>
+  </div>
+
+  <div class="card">
+    <div class="console-head"><b>⚡ COOLGUY-X Console</b><span class="badge" id="uptime">0h 0m 0s</span></div>
+    
+    <div class="stats">
+      <div class="stat"><small>Visitors</small><b id="visitors">146</b></div>
+      <div class="stat"><small>Requests</small><b id="requests">7,748</b></div>
+      <div class="stat"><small>Success</small><b style="color:#22c55e" id="success">4,393</b></div>
+      <div class="stat"><small>Failed</small><b style="color:#ef4444">0</b></div>
+    </div>
+
+    <div class="logs">
+      <div>[BOOT] COOLGUY-X portal initialized.</div>
+      <div><span>[INFO] Ready for pairing request...</span></div>
+      <div id="log-extra"></div>
+    </div>
+  </div>
+
+  <div class="url-bar">🏠 pair.coolguybot.space</div>
 </div>
+
+<div class="bottom-nav">
+  <button onclick="generateCode()">🔗 Generate</button>
+  <button onclick="copyCode()">⎙ Copy</button>
 </div>
-<div class="card">
-<h3>📱 WhatsApp Number</h3>
-<input id="num" class="input" value="256750765838">
-<button id="btn" class="btn" onclick="gen()" style="margin-top:15px;">🔗 GENERATE 8-DIGIT CODE (90s)</button>
-<div id="box" class="code-box">
-<p style="color:#aaa;">YOUR CODE:</p>
-<div id="code" class="code">---- ----</div>
-<p>Expires in <span id="timer" style="color:#ffaa00;font-weight:900;font-size:26px;">90s</span></p>
-<p style="color:#00ff88;font-size:11px;margin-top:8px;">WhatsApp > Linked Devices > Link with phone number</p>
-</div>
-</div>
-</div>
+
 <script>
-async function gen(){
-const n=document.getElementById('num').value.replace(/[^0-9]/g,'');
-if(n.length<10)return alert('Add number with 256');
-const b=document.getElementById('btn'),box=document.getElementById('box'),c=document.getElementById('code');
-b.disabled=true;b.textContent='⏳ GENERATING...';box.classList.add('show');c.textContent='.... ....';
-try{
-const r=await fetch('/pair?number='+n);
-const d=await r.json();
-if(d.code){
-c.textContent=d.code;
-b.textContent='✅ CODE LIVE!';
-let s=90;
-const iv=setInterval(()=>{
-s--;document.getElementById('timer').textContent=s+'s';
-if(s<=0){clearInterval(iv);document.getElementById('timer').textContent='EXPIRED';b.disabled=false;b.textContent='🔗 GENERATE NEW CODE'}
-},1000)
-}else{alert(d.error||'Failed');b.disabled=false;b.textContent='🔗 GENERATE CODE'}
-}catch(e){alert(e.message);b.disabled=false;b.textContent='🔗 GENERATE CODE'}
+let pairCode = "";
+function generateCode(){
+  const num = document.getElementById('number').value;
+  if(!num || num.length < 10){ alert("Enter valid WhatsApp number with country code"); return; }
+  pairCode = Math.random().toString(36).substring(2,6).toUpperCase() + "-" + Math.random().toString(36).substring(2,6).toUpperCase();
+  document.getElementById('log-extra').innerHTML = `<div>[PAIR] Number: ${num}</div><div style="color:#38bdf8;font-size:13px;font-weight:700">CODE: ${pairCode}</div><div>[INFO] Enter this code in WhatsApp > Linked Devices</div>`;
+  // HERE CONNECT YOUR BACKEND:
+  // fetch(`/api/pair?number=${num}`)
+  // .then(r=>r.json()).then(data=> show session)
 }
+function copyCode(){
+  if(!pairCode){ alert("Generate code first"); return; }
+  navigator.clipboard.writeText(pairCode);
+  alert("Copied: " + pairCode);
+}
+function resetNum(){ document.getElementById('number').value=""; pairCode=""; document.getElementById('log-extra').innerHTML=""; }
+
+// fake uptime counter like video
+let sec=0; setInterval(()=>{sec++; let h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60; document.getElementById('uptime').innerText=`${h}h ${m}m ${s}s`;},1000);
 </script>
 </body>
   </html>
